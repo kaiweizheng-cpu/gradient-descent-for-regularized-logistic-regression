@@ -1,17 +1,13 @@
 import numpy as np
 import pandas as pd
-
-
-def sigmoid(z):
-    return 1.0 / (1.0 + np.exp(-z))
-
+from scipy.special import expit, logit
 
 class LogisticLoss:
     def __init__(self, lam=0.01):
         self.lam = lam
 
     def predict(self, X, w, b):
-        return sigmoid(X @ w + b)
+        return expit(X @ w + b)
 
     def compute_loss(self, X, w, b, y):
         p = self.predict(X, w, b)
@@ -28,7 +24,7 @@ class LogisticLoss:
         return dw, db
 
 
-class GradientDescent: 
+class GradientDescent:
     def __init__(self, lr):
         self.lr = lr
 
@@ -55,7 +51,7 @@ def load_bank_data(path):
 
 
 def accuracy(X, w, b, y):
-    p = sigmoid(X @ w + b)
+    p = expit(X @ w + b)
     return np.mean((p >= 0.5) == y)
 
 
@@ -78,7 +74,7 @@ if __name__ == "__main__":
 
     n, d = X_tr.shape
     print(f"train: n={n}, test: n={len(te_idx)}, attributes: d={d}")
-    
+
     w = np.zeros(d)
     b = 0.0
     lam = 0.01             # L2 regularization strength
