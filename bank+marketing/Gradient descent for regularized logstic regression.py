@@ -78,8 +78,7 @@ if __name__ == "__main__":
 
     n, d = X_tr.shape
     print(f"train: n={n}, test: n={len(te_idx)}, attributes: d={d}")
-
-    # ---- train regularized logistic regression ----
+    
     w = np.zeros(d)
     b = 0.0
     lam = 0.01             # L2 regularization strength
