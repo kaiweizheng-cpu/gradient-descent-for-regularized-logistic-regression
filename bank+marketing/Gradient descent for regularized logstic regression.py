@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from scipy.special import expit, logit
+from scipy.special import expit
+from sklearn.model_selection import train_test_split
+
 
 class LogisticLoss:
     def __init__(self, lam=0.01):
@@ -58,22 +60,20 @@ def accuracy(X, w, b, y):
 if __name__ == "__main__":
     X_num, X_cat, y, feature_names = load_bank_data("bank/bank-full.csv")
 
-    # train/test split (shuffle first)
-    rng = np.random.RandomState(0)
-    idx = rng.permutation(len(y))
-    split = int(0.8 * len(y))
-    tr_idx, te_idx = idx[:split], idx[split:]
+    X = np.hstack([X_num, X_cat])
+    X_tr, X_te, y_tr, y_te = train_test_split(
+        X, y, test_size=0.2, random_state=0
+    )
 
     # standardize numeric features using training-set statistics only
-    mu, std = X_num[tr_idx].mean(axis=0), X_num[tr_idx].std(axis=0)
-    X_num = (X_num - mu) / std
-
-    X = np.hstack([X_num, X_cat])
-    X_tr, y_tr = X[tr_idx], y[tr_idx]
-    X_te, y_te = X[te_idx], y[te_idx]
+    num_w = X_num.shape[1]
+    mu = X_tr[:, :num_w].mean(axis=0)
+    std = X_tr[:, :num_w].std(axis=0)
+    X_tr[:, :num_w] = (X_tr[:, :num_w] - mu) / std
+    X_te[:, :num_w] = (X_te[:, :num_w] - mu) / std
 
     n, d = X_tr.shape
-    print(f"train: n={n}, test: n={len(te_idx)}, attributes: d={d}")
+    print(f"train: n={n}, test: n={X_te.shape[0]}, attributes: d={d}")
 
     w = np.zeros(d)
     b = 0.0
